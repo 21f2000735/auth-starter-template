@@ -14,8 +14,8 @@
     <groupId>com.coderhigher</groupId>
     <artifactId>backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>coder-higher-auth-backend</name>
-    <description>Spring Boot backend for coder-higher-auth-starter</description>
+    <name>openclaw-gmail-backend</name>
+    <description>Spring Boot backend for OpenClaw Gmail</description>
 
     <properties>
         <java.version>21</java.version>

@@ -103,7 +103,7 @@ onMounted(loadAuthStatus)
     <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
       <div class="container d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
-          <a class="navbar-brand fw-semibold mb-0" href="#">Coder Higher</a>
+          <a class="navbar-brand fw-semibold mb-0" href="#">OpenClaw Gmail</a>
           <span class="badge text-bg-dark">auth starter</span>
         </div>
 

@@ -1,7 +1,7 @@
 # making.md
 
 ## Purpose
-This file is the portable build manual, feature map, and decision log for `coder-higher-auth-starter`.
+This file is the portable build manual, feature map, and decision log for `openclaw-gmail`.
 
 It must remain useful even if a different developer opens the repository later. A new developer should be able to understand the project, pick a feature area quickly, continue work safely, and know what external setup is still required.
 
@@ -22,7 +22,7 @@ Build a localhost-only authentication starter app named **OpenClaw Gmail** with:
 - Keycloak integration deferred to a later phase
 
 ## Current Repo Location
-`/Users/indiadelhi/repo/apps/coder-higher-auth-starter`
+`/Users/indiadelhi/repo/apps/openclaw-gmail`
 
 ## Push Policy
 - Local git repo only for now

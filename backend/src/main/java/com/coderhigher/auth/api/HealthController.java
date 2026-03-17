@@ -11,6 +11,6 @@ public class HealthController {
 
     @GetMapping("/health")
     public Map<String, String> health() {
-        return Map.of("status", "ok", "service", "coder-higher-auth-backend");
+        return Map.of("status", "ok", "service", "openclaw-gmail-backend");
     }
 }

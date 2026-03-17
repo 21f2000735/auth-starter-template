@@ -1,6 +1,6 @@
 spring:
   application:
-    name: coder-higher-auth-backend
+    name: openclaw-gmail-backend
   security:
     oauth2:
       client:

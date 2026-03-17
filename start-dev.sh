@@ -11,7 +11,7 @@ if [ -f "$BACKEND_ENV" ]; then
   set +a
 fi
 
-echo "Starting coder-higher-auth-starter local app services..."
+echo "Starting OpenClaw Gmail local app services..."
 echo "Tip: start infrastructure separately with: cd infra && docker compose up -d"
 
 (
