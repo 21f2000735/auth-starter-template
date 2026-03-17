@@ -20,6 +20,7 @@ Build a localhost-only authentication starter app named **OpenClaw Gmail** with:
 - Postgres + Keycloak Docker setup kept in repo for later phases
 - `.sh` as the primary startup script
 - Keycloak integration deferred to a later phase
+- this repo should be treated as a reusable login template for future frontend + backend projects, so both sides can take help from it later
 
 ## Current Repo Location
 `/Users/indiadelhi/repo/apps/openclaw-gmail`
@@ -98,6 +99,8 @@ This section is meant for fast pickup. Each feature area should always show stat
 - Google login CTA button wired to backend authorization endpoint
 - frontend auth status fetch
 - frontend profile fetch from `/api/me`
+- sample dashboard UI wired to protected sample API
+- guest/authenticated app shell split for startup-template flow
 
 ### Files
 - `frontend/src/App.vue`
@@ -109,6 +112,7 @@ This section is meant for fast pickup. Each feature area should always show stat
 - Google button points to backend auth entrypoint
 - frontend reads backend auth state from `/api/auth/status`
 - frontend fetches profile/session info from `/api/me` when authenticated
+- frontend dashboard consumes `/api/dashboard/summary`
 
 ### Next
 - add real route structure if the UI grows beyond the current guest/auth split
@@ -125,6 +129,9 @@ This section is meant for fast pickup. Each feature area should always show stat
 - health endpoint
 - protected profile endpoint
 - auth status endpoint
+- sample dashboard endpoint
+- dashboard service layer
+- global exception handler
 - initial security config
 - Google OAuth placeholders in config
 
@@ -140,14 +147,15 @@ This section is meant for fast pickup. Each feature area should always show stat
 - `/api/health` is public
 - `/api/auth/status` exposes frontend-readable session state
 - `/api/me` returns authenticated profile details
+- `/api/dashboard/summary` provides a sample protected startup dashboard API
 - successful Google login now redirects back to the frontend
 - other endpoints are treated as authenticated
 - Spring Security is prepared for Google OAuth login flow
 
 ### Next
-- add auth/session status endpoint
-- add safer frontend redirect/logout handling
+- add lightweight background-task example
 - refine CORS/session behavior for localhost
+- evolve into clearer controller/service layering examples over time
 
 ---
 
@@ -221,6 +229,9 @@ Google OAuth direct in the app is the faster, cleaner phase-1 path.
 - Google OAuth button wired to backend authorization endpoint
 - frontend reads `/api/auth/status`
 - frontend fetches `/api/me` profile data when authenticated
+- sample dashboard API added at `/api/dashboard/summary`
+- frontend dashboard wired to the sample API
+- global API exception handler added
 - exact Google OAuth redirect/config path documented
 - successful Google login verified at backend session level
 - login success handler added to return users to the frontend after auth
@@ -288,8 +299,8 @@ Google OAuth direct in the app is the faster, cleaner phase-1 path.
 2. confirm Google OAuth client is configured correctly for localhost
 
 ## Still needs implementation
-1. dedicated frontend route split for guest vs authenticated views
-2. final localhost auth verification with real Google credentials
+1. lightweight background-task example
+2. stronger frontend route/module split if the UI grows further
 3. optional env-loading/documentation refinement
 4. later Keycloak migration path
 
@@ -297,10 +308,10 @@ Google OAuth direct in the app is the faster, cleaner phase-1 path.
 
 # 8) Immediate Next Steps
 
-1. Add frontend route/state handling for logged-in user flow
-2. Split guest landing and authenticated dashboard/profile screens more cleanly
-3. Test full localhost flow after Google credentials are available
-4. Keep phase-2 Keycloak path documented and ready
+1. Add a lightweight background-task example with safe local defaults
+2. Improve error-state presentation and standard response patterns further
+3. Keep phase-2 Keycloak path documented and ready
+4. Add optional module/toggle guidance for future features
 
 ---
 

@@ -4,8 +4,10 @@ import { computed, onMounted, ref } from 'vue'
 const backendBase = 'http://localhost:8080'
 const loading = ref(true)
 const profileLoading = ref(false)
+const dashboardLoading = ref(false)
 const authError = ref('')
 const profileError = ref('')
+const dashboardError = ref('')
 const authState = ref({
   authenticated: false,
   username: null,
@@ -17,6 +19,14 @@ const profile = ref({
   email: null,
   picture: null,
   username: null,
+})
+const dashboard = ref({
+  appName: 'OpenClaw Gmail',
+  environment: 'localhost',
+  authenticated: false,
+  username: 'guest',
+  cards: [],
+  recentActions: [],
 })
 
 const quickChecks = computed(() => [
@@ -39,15 +49,16 @@ async function loadAuthStatus() {
       credentials: 'include',
     })
 
-    if (!response.ok) {
-      throw new Error(`Auth status returned ${response.status}`)
-    }
+    if (!response.ok) throw new Error(`Auth status returned ${response.status}`)
 
     authState.value = await response.json()
 
-    if (authState.value.authenticated) {
-      await loadProfile()
-    } else {
+    await Promise.all([
+      loadDashboard(),
+      authState.value.authenticated ? loadProfile() : Promise.resolve(),
+    ])
+
+    if (!authState.value.authenticated) {
       profile.value = { name: null, email: null, picture: null, username: null }
     }
   } catch (error) {
@@ -66,15 +77,32 @@ async function loadProfile() {
       credentials: 'include',
     })
 
-    if (!response.ok) {
-      throw new Error(`Profile returned ${response.status}`)
-    }
+    if (!response.ok) throw new Error(`Profile returned ${response.status}`)
 
     profile.value = await response.json()
   } catch (error) {
     profileError.value = error instanceof Error ? error.message : 'Unable to load profile'
   } finally {
     profileLoading.value = false
+  }
+}
+
+async function loadDashboard() {
+  dashboardLoading.value = true
+  dashboardError.value = ''
+
+  try {
+    const response = await fetch(`${backendBase}/api/dashboard/summary`, {
+      credentials: 'include',
+    })
+
+    if (!response.ok) throw new Error(`Dashboard returned ${response.status}`)
+
+    dashboard.value = await response.json()
+  } catch (error) {
+    dashboardError.value = error instanceof Error ? error.message : 'Unable to load dashboard'
+  } finally {
+    dashboardLoading.value = false
   }
 }
 
@@ -125,9 +153,9 @@ onMounted(loadAuthStatus)
           <section class="card border-0 shadow-sm h-100">
             <div class="card-body p-4 p-md-5">
               <p class="text-uppercase text-secondary small fw-semibold mb-2">Guest view</p>
-              <h1 class="display-6 fw-bold mb-3">OpenClaw Gmail — Vue 3 + Spring Boot starter</h1>
+              <h1 class="display-6 fw-bold mb-3">OpenClaw Gmail — startup-ready auth starter</h1>
               <p class="lead text-secondary mb-4">
-                Phase 1 keeps the user experience simple: Google OAuth directly in the app, with the backend owning the auth flow.
+                Auth is solved first so future products can focus on content, features, and business logic instead of rebuilding login every time.
               </p>
 
               <div class="d-flex flex-wrap gap-3 mb-4">
@@ -168,9 +196,7 @@ onMounted(loadAuthStatus)
                 </div>
               </div>
 
-              <div v-if="authError" class="alert alert-warning mt-3 mb-0">
-                {{ authError }}
-              </div>
+              <div v-if="authError" class="alert alert-warning mt-3 mb-0">{{ authError }}</div>
             </div>
           </section>
         </div>
@@ -184,31 +210,38 @@ onMounted(loadAuthStatus)
               <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
                 <div>
                   <h1 class="h2 mb-2">Welcome, {{ profileDisplayName }}</h1>
-                  <p class="text-secondary mb-0">Your session is active and the frontend is reading protected backend state.</p>
+                  <p class="text-secondary mb-0">Your session is active and this dashboard is consuming a protected sample API.</p>
                 </div>
                 <span class="badge text-bg-success">Authenticated</span>
               </div>
 
-              <div class="row g-3">
-                <div class="col-md-4">
+              <div v-if="dashboardLoading" class="text-secondary small mb-3">Loading dashboard...</div>
+              <div v-else class="row g-3">
+                <div v-for="card in dashboard.cards" :key="card.title" class="col-md-4">
                   <div class="rounded-3 border p-3 bg-body-tertiary h-100">
-                    <div class="text-secondary small">Identity</div>
-                    <div class="fw-semibold mt-1">{{ profileDisplayName }}</div>
-                    <div class="small text-secondary">Google profile resolved via backend</div>
+                    <div class="text-secondary small">{{ card.title }}</div>
+                    <div class="fw-semibold mt-1">{{ card.value }}</div>
+                    <div class="small text-secondary">{{ card.hint }}</div>
                   </div>
                 </div>
-                <div class="col-md-4">
-                  <div class="rounded-3 border p-3 bg-body-tertiary h-100">
-                    <div class="text-secondary small">Email</div>
-                    <div class="fw-semibold mt-1">{{ profile.email || 'pending' }}</div>
-                    <div class="small text-secondary">From Google OAuth response</div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="rounded-3 border p-3 bg-body-tertiary h-100">
-                    <div class="text-secondary small">Phase 2</div>
-                    <div class="fw-semibold mt-1">Keycloak</div>
-                    <div class="small text-secondary">Can replace direct auth later</div>
+              </div>
+
+              <div v-if="dashboardError" class="alert alert-warning mt-3 mb-0">{{ dashboardError }}</div>
+            </div>
+          </section>
+
+          <section class="card border-0 shadow-sm mt-4">
+            <div class="card-body p-4">
+              <p class="text-uppercase text-secondary small fw-semibold mb-1">Recent starter actions</p>
+              <h2 class="h4 mb-3">Example dashboard feed</h2>
+              <div class="list-group list-group-flush">
+                <div v-for="item in dashboard.recentActions" :key="item.action" class="list-group-item px-0">
+                  <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                      <div class="fw-semibold">{{ item.action }}</div>
+                      <div class="text-secondary small">{{ item.note }}</div>
+                    </div>
+                    <span class="badge text-bg-light border">{{ item.status }}</span>
                   </div>
                 </div>
               </div>
@@ -247,12 +280,10 @@ onMounted(loadAuthStatus)
 
               <div class="d-grid gap-2 mt-3">
                 <button class="btn btn-outline-primary" @click="loadAuthStatus">Refresh session</button>
-                <a class="btn btn-outline-secondary" :href="`${backendBase}/api/health`" target="_blank">Backend health</a>
+                <button class="btn btn-outline-secondary" @click="loadDashboard">Refresh dashboard</button>
               </div>
 
-              <div v-if="profileError" class="alert alert-warning mt-3 mb-0">
-                {{ profileError }}
-              </div>
+              <div v-if="profileError" class="alert alert-warning mt-3 mb-0">{{ profileError }}</div>
             </div>
           </section>
         </div>
