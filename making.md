@@ -10,7 +10,7 @@ It must remain useful even if a different developer opens the repository later. 
 # 1) Project Overview
 
 ## Current Goal
-Build a localhost-only authentication starter app named **OpenClaw Gmail** with:
+Build a startup-ready authentication starter template whose current example app is **OpenClaw Gmail**, with:
 - Vue 3 frontend
 - Bootstrap UI
 - Spring Boot backend
@@ -25,9 +25,12 @@ Build a localhost-only authentication starter app named **OpenClaw Gmail** with:
 ## Current Repo Location
 `/Users/indiadelhi/repo/apps/openclaw-gmail`
 
+## GitHub Repo
+`https://github.com/21f2000735/auth-starter-template`
+
 ## Push Policy
-- Local git repo only for now
-- Do **not** push to GitHub yet
+- GitHub repo now exists under the generic template name `auth-starter-template`
+- local example app folder is currently still named `openclaw-gmail`
 
 ---
 
@@ -100,6 +103,7 @@ This section is meant for fast pickup. Each feature area should always show stat
 - frontend auth status fetch
 - frontend profile fetch from `/api/me`
 - sample dashboard UI wired to protected sample API
+- lightweight background-job UI example for authenticated users
 - guest/authenticated app shell split for startup-template flow
 
 ### Files
@@ -113,6 +117,7 @@ This section is meant for fast pickup. Each feature area should always show stat
 - frontend reads backend auth state from `/api/auth/status`
 - frontend fetches profile/session info from `/api/me` when authenticated
 - frontend dashboard consumes `/api/dashboard/summary`
+- frontend can trigger and poll a protected demo job via `/api/jobs/gmail-sync`
 
 ### Next
 - add real route structure if the UI grows beyond the current guest/auth split
@@ -131,6 +136,8 @@ This section is meant for fast pickup. Each feature area should always show stat
 - auth status endpoint
 - sample dashboard endpoint
 - dashboard service layer
+- protected background-job endpoints
+- in-memory job service for demo async flow
 - global exception handler
 - initial security config
 - Google OAuth placeholders in config
@@ -148,14 +155,16 @@ This section is meant for fast pickup. Each feature area should always show stat
 - `/api/auth/status` exposes frontend-readable session state
 - `/api/me` returns authenticated profile details
 - `/api/dashboard/summary` provides a sample protected startup dashboard API
-- successful Google login now redirects back to the frontend
+- `/api/jobs/gmail-sync` and `/api/jobs/{id}` provide a protected async-job example
+- successful Google login now redirects back to the configured frontend base URL
+- unauthenticated `/api/**` requests return JSON 401 responses for SPA use
 - other endpoints are treated as authenticated
 - Spring Security is prepared for Google OAuth login flow
 
 ### Next
-- add lightweight background-task example
 - refine CORS/session behavior for localhost
 - evolve into clearer controller/service layering examples over time
+- standardize JSON auth/error behavior for SPA consumers
 
 ---
 
@@ -231,6 +240,8 @@ Google OAuth direct in the app is the faster, cleaner phase-1 path.
 - frontend fetches `/api/me` profile data when authenticated
 - sample dashboard API added at `/api/dashboard/summary`
 - frontend dashboard wired to the sample API
+- protected async job example added at `/api/jobs/gmail-sync`
+- frontend can trigger/poll the demo job flow
 - global API exception handler added
 - exact Google OAuth redirect/config path documented
 - successful Google login verified at backend session level
@@ -299,17 +310,17 @@ Google OAuth direct in the app is the faster, cleaner phase-1 path.
 2. confirm Google OAuth client is configured correctly for localhost
 
 ## Still needs implementation
-1. lightweight background-task example
-2. stronger frontend route/module split if the UI grows further
-3. optional env-loading/documentation refinement
+1. stronger frontend route/module split if the UI grows further
+2. optional env-loading/documentation refinement
+3. standard JSON 401/403 behavior for API consumers
 4. later Keycloak migration path
 
 ---
 
 # 8) Immediate Next Steps
 
-1. Add a lightweight background-task example with safe local defaults
-2. Improve error-state presentation and standard response patterns further
+1. Improve error-state presentation and standard response patterns further
+2. Replace remaining hardcoded frontend/backend assumptions with config-driven values
 3. Keep phase-2 Keycloak path documented and ready
 4. Add optional module/toggle guidance for future features
 
@@ -323,3 +334,5 @@ Whenever this project changes, update `making.md` in a reusable way:
 - which feature it belongs to
 - whether it is done / in progress / pending / blocked
 - what a future developer should do next
+- enough current-state detail that the project can be designed, understood, and continued just by reading this file
+- when broader personal/project context matters, rely on MEMORY/context separately for that understanding rather than bloating this file with unrelated history

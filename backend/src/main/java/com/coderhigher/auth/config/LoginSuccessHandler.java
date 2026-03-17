@@ -11,12 +11,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
+    private final FrontendProperties frontendProperties;
+
+    public LoginSuccessHandler(FrontendProperties frontendProperties) {
+        this.frontendProperties = frontendProperties;
+    }
+
     @Override
     public void onAuthenticationSuccess(
             HttpServletRequest request,
             HttpServletResponse response,
             Authentication authentication
     ) throws IOException, ServletException {
-        response.sendRedirect("http://localhost:5173/");
+        response.sendRedirect(frontendProperties.baseUrl() + "/");
     }
 }

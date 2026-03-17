@@ -5,9 +5,11 @@ const backendBase = 'http://localhost:8080'
 const loading = ref(true)
 const profileLoading = ref(false)
 const dashboardLoading = ref(false)
+const jobLoading = ref(false)
 const authError = ref('')
 const profileError = ref('')
 const dashboardError = ref('')
+const jobError = ref('')
 const authState = ref({
   authenticated: false,
   username: null,
@@ -28,6 +30,7 @@ const dashboard = ref({
   cards: [],
   recentActions: [],
 })
+const jobState = ref(null)
 
 const quickChecks = computed(() => [
   { label: 'Frontend', value: 'Vue 3 + Bootstrap', status: 'Ready' },
@@ -60,6 +63,7 @@ async function loadAuthStatus() {
 
     if (!authState.value.authenticated) {
       profile.value = { name: null, email: null, picture: null, username: null }
+      jobState.value = null
     }
   } catch (error) {
     authError.value = error instanceof Error ? error.message : 'Unable to read auth state'
@@ -106,6 +110,44 @@ async function loadDashboard() {
   }
 }
 
+async function startGmailSyncJob() {
+  jobLoading.value = true
+  jobError.value = ''
+
+  try {
+    const response = await fetch(`${backendBase}/api/jobs/gmail-sync`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+
+    if (!response.ok) throw new Error(`Job start returned ${response.status}`)
+
+    const payload = await response.json()
+    await pollJob(payload.jobId)
+  } catch (error) {
+    jobError.value = error instanceof Error ? error.message : 'Unable to start Gmail sync job'
+  } finally {
+    jobLoading.value = false
+  }
+}
+
+async function pollJob(jobId) {
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const response = await fetch(`${backendBase}/api/jobs/${jobId}`, {
+      credentials: 'include',
+    })
+
+    if (!response.ok) throw new Error(`Job poll returned ${response.status}`)
+
+    jobState.value = await response.json()
+    if (jobState.value.status === 'SUCCEEDED' || jobState.value.status === 'FAILED') {
+      return
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 900))
+  }
+}
+
 function startGoogleLogin() {
   window.location.href = `${backendBase}${authState.value.loginUrl || '/oauth2/authorization/google'}`
 }
@@ -117,6 +159,7 @@ async function logout() {
       credentials: 'include',
     })
     profile.value = { name: null, email: null, picture: null, username: null }
+    jobState.value = null
     await loadAuthStatus()
   } catch (error) {
     authError.value = error instanceof Error ? error.message : 'Logout failed'
@@ -232,8 +275,16 @@ onMounted(loadAuthStatus)
 
           <section class="card border-0 shadow-sm mt-4">
             <div class="card-body p-4">
-              <p class="text-uppercase text-secondary small fw-semibold mb-1">Recent starter actions</p>
-              <h2 class="h4 mb-3">Example dashboard feed</h2>
+              <div class="d-flex justify-content-between align-items-center mb-3 gap-3">
+                <div>
+                  <p class="text-uppercase text-secondary small fw-semibold mb-1">Recent starter actions</p>
+                  <h2 class="h4 mb-0">Example dashboard feed</h2>
+                </div>
+                <button class="btn btn-outline-dark" :disabled="jobLoading" @click="startGmailSyncJob">
+                  {{ jobLoading ? 'Starting job...' : 'Run Gmail sync job' }}
+                </button>
+              </div>
+
               <div class="list-group list-group-flush">
                 <div v-for="item in dashboard.recentActions" :key="item.action" class="list-group-item px-0">
                   <div class="d-flex justify-content-between align-items-start gap-3">
@@ -245,6 +296,14 @@ onMounted(loadAuthStatus)
                   </div>
                 </div>
               </div>
+
+              <div v-if="jobState" class="alert alert-light border mt-3 mb-0">
+                <div class="fw-semibold">Background job: {{ jobState.jobType }}</div>
+                <div class="small text-secondary">Status: {{ jobState.status }} · Progress: {{ jobState.progress }}%</div>
+                <div class="small text-secondary">{{ jobState.message }}</div>
+              </div>
+
+              <div v-if="jobError" class="alert alert-warning mt-3 mb-0">{{ jobError }}</div>
             </div>
           </section>
         </div>

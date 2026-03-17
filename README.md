@@ -1,15 +1,64 @@
-# OpenClaw Gmail
+# auth-starter-template
 
-A localhost-only authentication starter project using:
+Current example app inside this template: **OpenClaw Gmail**
+
+A startup-ready authentication starter template using:
 - Vue 3 frontend
 - Bootstrap UI
 - Spring Boot backend
 - Google OAuth directly in the app for phase 1
-- Docker Compose for local infrastructure
+- Docker Compose for optional local infrastructure
 - Keycloak reserved for a later phase
 
+## What this template already gives you
+- login
+- logout
+- backend session check
+- protected profile API
+- protected dashboard API
+- guest/authenticated app shell
+- lightweight protected background-job example
+- startup scripts
+- structured project memory via `making.md`
+
 ## Status
-Bootstrap in progress.
+Core starter foundation is working locally.
+
+## Repo structure
+- `frontend/` → Vue 3 app shell, auth-state consumption, dashboard/profile UI
+- `backend/` → Spring Boot auth/session/profile/dashboard/job APIs
+- `infra/` → optional Postgres + Keycloak preparation for later phases
+- `making.md` → detailed project contract, status, design direction, and future pickup guide
+
+## Quickstart
+### 1. Prepare backend env
+Copy:
+- `backend/.env.example` → `backend/.env`
+
+Then set:
+- `GOOGLE_CLIENT_ID=...`
+- `GOOGLE_CLIENT_SECRET=...`
+- `FRONTEND_BASE_URL=http://localhost:5173`
+
+### 2. Start the app
+From repo root:
+```bash
+./start-dev.sh
+```
+
+### 3. Open locally
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:8080`
+- Health: `http://localhost:8080/api/health`
+
+### 4. Stop locally
+```bash
+./stop.sh
+```
+
+## Google OAuth setup
+Create a Google OAuth client and add this exact redirect URI:
+- `http://localhost:8080/login/oauth2/code/google`
 
 ## Local Infrastructure Plan
 Docker Compose currently prepares:
@@ -31,43 +80,14 @@ Planned local defaults:
 - Keycloak admin password: `root`
 - Default application test user password: `root`
 
-## Startup Approach
-- Infrastructure: Docker Compose
-- App startup: `start-dev.sh`
-
-## Google OAuth Setup (Phase 1)
-Before login can work, create Google OAuth credentials.
-
-### Google Cloud steps
-1. Go to Google Cloud Console.
-2. Create or choose a project.
-3. Configure the OAuth consent screen.
-4. Create an OAuth 2.0 Client ID.
-5. Choose **Web application**.
-6. Add this authorized redirect URI:
-   - `http://localhost:8080/login/oauth2/code/google`
-
-### Local backend credentials
-1. Copy:
-   - `backend/.env.example` → `backend/.env`
-2. Put your values in `backend/.env`:
-   - `GOOGLE_CLIENT_ID=...`
-   - `GOOGLE_CLIENT_SECRET=...`
-3. Run:
-   - `./start-dev.sh`
-
-### Local login flow
-- Frontend runs on `http://localhost:5173`
-- Backend runs on `http://localhost:8080`
-- Frontend button redirects to Spring Boot Google login
-- Spring Boot handles the OAuth callback and session
-
 ## Verified Working State
 Verified locally:
 - frontend starts successfully
 - backend starts successfully
 - Google OAuth redirect begins successfully
 - authenticated backend session was confirmed via `/api/auth/status`
+- sample protected dashboard API works
+- protected demo background-job flow exists
 
 ## Notes
-See `making.md` for the full decision log, instructions, and ongoing project memory.
+See `making.md` for the full design and ongoing project memory.
