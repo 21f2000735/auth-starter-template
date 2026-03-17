@@ -83,12 +83,14 @@ This section is meant for fast pickup. Each feature area should always show stat
 ### Files
 - `README.md`
 - `making.md`
+- `architecture.md`
 - `start-dev.sh`
 - `stop.sh`
 - `.gitignore`
 
 ### Next
 - keep updating docs when architecture or setup changes
+- keep `architecture.md` aligned with the implemented HLD/LLD and feature set
 
 ---
 

@@ -90,4 +90,6 @@ Verified locally:
 - protected demo background-job flow exists
 
 ## Notes
-See `making.md` for the full design and ongoing project memory.
+See these project docs:
+- `making.md` → full design direction, feature status, and project memory
+- `architecture.md` → HLD, LLD, technologies used, features implemented, and next extension paths
